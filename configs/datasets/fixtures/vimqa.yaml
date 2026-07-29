@@ -1,0 +1,8 @@
+name: vimqa
+adapter: vimqa
+split: validation
+language: vi
+evaluation_profile: qa_evidence_retrieval
+data_path: tests/fixtures/vimqa/dev.json
+evidence_policy: official_supporting_facts
+validation: {fail_on_mapping_error: true, minimum_mapping_rate: 1.0}

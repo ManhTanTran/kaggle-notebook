@@ -1,0 +1,20 @@
+run_name: advanced_methods_mock_smoke
+dataset: {name: synthetic}
+methods:
+  - {name: semantic_breakpoint, backend_type: mock, min_chunk_tokens: 1}
+  - {name: semantic_single_linkage_paper_exact, backend_type: mock, target_clusters: 2}
+  - {name: meta_ppl_raw, backend_type: mock, prominence: 0.01}
+  - {name: meta_ppl_dynamic_512, backend_type: mock, prominence: 0.01, max_chunk_tokens: 512}
+  - {name: pic_paper_reimplementation, backend_type: mock}
+  - {name: pic_reimplementation_capped_512, backend_type: mock, max_chunk_tokens: 512}
+  - name: late_fixed_256
+    representation: {backend_type: mock, pooling: mean, normalize: true, max_model_tokens: 8192, long_document_policy: error}
+  - name: late_fixed_512
+    representation: {backend_type: mock, pooling: mean, normalize: true, max_model_tokens: 8192, long_document_policy: error}
+embedding: {name: hashing, dimension: 256}
+retrieval: {name: cosine}
+evaluation: {k_values: [3, 5, 10], token_budgets: [2048], retrieval_depth: 100, strict_token_budget: true, duplicate_scope: within_document}
+output_dir: outputs
+seed: 42
+smoke: true
+fail_fast: false

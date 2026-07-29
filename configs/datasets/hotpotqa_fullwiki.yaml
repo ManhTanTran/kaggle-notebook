@@ -1,0 +1,11 @@
+name: hotpotqa_fullwiki
+adapter: hotpotqa_fullwiki
+split: validation
+language: en
+evaluation_profile: qa_evidence_retrieval
+questions_path: data/raw/hotpotqa_fullwiki/validation.json
+corpus_path: data/raw/hotpotqa_fullwiki/corpus
+corpus_mode: supporting_documents_streamed_by_title
+validation:
+  fail_on_mapping_error: true
+  minimum_mapping_rate: 0.95

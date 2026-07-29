@@ -1,0 +1,11 @@
+run_name: semantic_real_smoke
+dataset: {name: synthetic}
+methods:
+  - {name: semantic_breakpoint, backend_type: real, threshold: {type: percentile, value: 90}, min_chunk_tokens: 1}
+  - {name: semantic_single_linkage_paper_exact, backend_type: real, target_clusters: 2, lambda_weight: 0.5, distance_threshold: 0.5}
+embedding: {name: sentence_transformer, model_name: sentence-transformers/all-MiniLM-L6-v2}
+retrieval: {name: cosine}
+evaluation: {k_values: [3, 5, 10], token_budgets: [2048], retrieval_depth: 10, strict_token_budget: true, duplicate_scope: within_document}
+output_dir: outputs
+seed: 42
+smoke: true

@@ -1,0 +1,6 @@
+k_values: [3, 5, 10]
+token_budgets: [2048]
+retrieval_depth: 100
+strict_token_budget: true
+duplicate_scope: within_document
+

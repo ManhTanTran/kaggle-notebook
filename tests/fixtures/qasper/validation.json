@@ -1,0 +1,67 @@
+{
+  "paper-a": {
+    "title": "Solar efficiency",
+    "abstract": ["This paper studies solar cells."],
+    "full_text": [
+      {
+        "section_name": "Results",
+        "paragraphs": [
+          "Efficiency improved by twenty percent.",
+          "The experiment lasted twelve weeks."
+        ]
+      }
+    ],
+    "qas": [
+      {
+        "question_id": "qasper-q1",
+        "question": "How much did efficiency improve?",
+        "answers": [
+          {
+            "annotation_id": "a1",
+            "answer": {
+              "unanswerable": false,
+              "extractive_spans": ["twenty percent"],
+              "free_form_answer": "",
+              "yes_no": null,
+              "evidence": ["Efficiency improved by twenty percent."]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "paper-b": {
+    "title": "Marine recovery",
+    "abstract": ["This paper studies coral reefs."],
+    "full_text": [
+      {
+        "section_name": "Methods",
+        "paragraphs": [
+          "Pollution controls began in January.",
+          "Coral recovery was measured at five reefs."
+        ]
+      }
+    ],
+    "qas": [
+      {
+        "question_id": "qasper-q2",
+        "question": "What supported the recovery finding?",
+        "answers": [
+          {
+            "annotation_id": "a2",
+            "answer": {
+              "unanswerable": false,
+              "extractive_spans": [],
+              "free_form_answer": "Two observations",
+              "yes_no": null,
+              "evidence": [
+                "Pollution controls began in January.",
+                "Coral recovery was measured at five reefs."
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

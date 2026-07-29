@@ -1,0 +1,34 @@
+run_name: all_qa_datasets_core_methods
+datasets:
+  - configs/datasets/qasper.yaml
+  - configs/datasets/hotpotqa_fullwiki.yaml
+  - configs/datasets/uit_viquad.yaml
+  - configs/datasets/vimqa.yaml
+methods:
+  - {name: fixed_256, chunk_size: 256}
+  - {name: fixed_512, chunk_size: 512}
+  - {name: sentence_fixed_256, chunk_size: 256}
+  - {name: sentence_fixed_512, chunk_size: 512}
+  - {name: semantic_breakpoint, backend_type: mock}
+  - {name: semantic_single_linkage_paper_exact, backend_type: mock}
+  - {name: meta_ppl_raw, backend_type: mock}
+  - {name: meta_ppl_dynamic_512, backend_type: mock, max_chunk_tokens: 512}
+  - {name: pic_paper_reimplementation, backend_type: mock}
+  - {name: pic_reimplementation_capped_512, backend_type: mock, max_chunk_tokens: 512}
+  - {name: late_fixed_256, representation: {backend_type: mock}}
+  - {name: late_fixed_512, representation: {backend_type: mock}}
+embedding: {name: hashing, dimension: 256, tokenizer: whitespace}
+retrieval: {name: cosine}
+evaluation:
+  k_values: [3, 5, 10]
+  token_budgets: [2048]
+  retrieval_depth: 100
+  strict_token_budget: true
+  duplicate_scope: within_document
+execution:
+  resume: true
+  skip_completed: true
+  fail_fast: false
+  save_intermediate_artifacts: true
+output_dir: outputs
+seed: 42

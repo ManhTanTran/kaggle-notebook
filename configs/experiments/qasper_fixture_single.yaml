@@ -1,0 +1,15 @@
+run_name: qasper_fixture_single
+dataset:
+  config: configs/datasets/fixtures/qasper.yaml
+methods:
+  - {name: fixed_256, chunk_size: 256}
+embedding: {name: hashing, dimension: 256}
+retrieval: {name: cosine}
+evaluation:
+  k_values: [3, 5, 10]
+  token_budgets: [2048]
+  retrieval_depth: 100
+  strict_token_budget: true
+  duplicate_scope: within_document
+output_dir: outputs
+seed: 42

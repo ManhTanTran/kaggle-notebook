@@ -1,0 +1,9 @@
+name: meta_ppl_dynamic_512
+backend_type: mock
+model_name: null
+model_revision: null
+context_policy: all_previous_segments
+prominence: 0.05
+dynamic_merge: true
+max_chunk_tokens: 512
+overflow_policy: split_at_segment_boundary

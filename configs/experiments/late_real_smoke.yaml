@@ -1,0 +1,13 @@
+run_name: late_real_smoke
+dataset: {name: synthetic}
+methods:
+  - name: late_fixed_256
+    representation: {backend_type: transformers, model_name: sentence-transformers/all-MiniLM-L6-v2, pooling: mean, normalize: true, max_model_tokens: 512, long_document_policy: error}
+  - name: late_fixed_512
+    representation: {backend_type: transformers, model_name: sentence-transformers/all-MiniLM-L6-v2, pooling: mean, normalize: true, max_model_tokens: 512, long_document_policy: error}
+embedding: {name: sentence_transformer, model_name: sentence-transformers/all-MiniLM-L6-v2}
+retrieval: {name: cosine}
+evaluation: {k_values: [3, 5, 10], token_budgets: [2048], retrieval_depth: 10, strict_token_budget: true, duplicate_scope: within_document}
+output_dir: outputs
+seed: 42
+smoke: true

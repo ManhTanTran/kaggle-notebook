@@ -1,0 +1,11 @@
+run_name: meta_ppl_real_smoke
+dataset: {name: synthetic}
+methods:
+  - {name: meta_ppl_raw, backend_type: transformers, model_name: gpt2, prominence: 0.05}
+  - {name: meta_ppl_dynamic_512, backend_type: transformers, model_name: gpt2, prominence: 0.05, max_chunk_tokens: 512}
+embedding: {name: hashing, dimension: 256}
+retrieval: {name: cosine}
+evaluation: {k_values: [3, 5, 10], token_budgets: [2048], retrieval_depth: 10, strict_token_budget: true, duplicate_scope: within_document}
+output_dir: outputs
+seed: 42
+smoke: true

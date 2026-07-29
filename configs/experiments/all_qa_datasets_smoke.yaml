@@ -1,0 +1,27 @@
+run_name: all_qa_datasets_smoke
+datasets:
+  - configs/datasets/fixtures/qasper.yaml
+  - configs/datasets/fixtures/hotpotqa_fullwiki.yaml
+  - configs/datasets/fixtures/uit_viquad.yaml
+  - configs/datasets/fixtures/vimqa.yaml
+methods:
+  - {name: fixed_256, chunk_size: 256}
+  - {name: fixed_512, chunk_size: 512}
+  - {name: sentence_fixed_256, chunk_size: 256}
+  - {name: sentence_fixed_512, chunk_size: 512}
+embedding: {name: hashing, dimension: 256, tokenizer: whitespace}
+retrieval: {name: cosine}
+evaluation:
+  k_values: [3, 5, 10]
+  token_budgets: [2048]
+  retrieval_depth: 100
+  strict_token_budget: true
+  duplicate_scope: within_document
+execution:
+  resume: false
+  skip_completed: false
+  fail_fast: false
+  save_intermediate_artifacts: true
+output_dir: outputs
+seed: 42
+smoke: true

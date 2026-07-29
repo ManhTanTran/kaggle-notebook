@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chunkbench"
+version = "0.1.0"
+description = "Reproducible document chunking benchmark"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "PyYAML>=6.0", "pandas>=2.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "ruff>=0.5", "ipykernel>=6.0", "jupyter>=1.0"]
+retrieval = ["faiss-cpu>=1.7"]
+embedding = ["sentence-transformers>=2.2"]
+semantic = ["sentence-transformers>=2.2"]
+ppl = ["torch>=2.1", "transformers>=4.38"]
+late = ["torch>=2.1", "transformers>=4.38"]
+clustering = ["scipy>=1.10", "scikit-learn>=1.3"]
+advanced = ["chunkbench[semantic,ppl,late,clustering]"]
+
+[project.scripts]
+chunkbench = "chunkbench.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

@@ -1,0 +1,22 @@
+[
+  {
+    "_id": "vimqa-q1",
+    "question": "Bảo tàng do An sáng lập nằm ở đâu?",
+    "answer": "Thành phố Beta",
+    "supporting_facts": [["Bảo tàng Alpha", 0], ["Thành phố Beta", 0]],
+    "context": [
+      ["Bảo tàng Alpha", ["An sáng lập Bảo tàng Alpha.", "Bảo tàng mở cửa năm 1999."]],
+      ["Thành phố Beta", ["Bảo tàng Alpha nằm ở Thành phố Beta.", "Thành phố có một con sông."]]
+    ]
+  },
+  {
+    "_id": "vimqa-q2",
+    "question": "Bảo tàng mở cửa năm nào?",
+    "answer": "1999",
+    "supporting_facts": [["Bảo tàng Alpha", 1]],
+    "context": [
+      ["Bảo tàng Alpha", ["An sáng lập Bảo tàng Alpha.", "Bảo tàng mở cửa năm 1999."]],
+      ["Thành phố Beta", ["Bảo tàng Alpha nằm ở Thành phố Beta.", "Thành phố có một con sông."]]
+    ]
+  }
+]

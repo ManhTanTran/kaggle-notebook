@@ -1,0 +1,8 @@
+name: qasper
+adapter: qasper
+split: validation
+language: en
+evaluation_profile: qa_evidence_retrieval
+data_path: tests/fixtures/qasper/validation.json
+unanswerable_policy: exclude
+validation: {fail_on_mapping_error: true, minimum_mapping_rate: 1.0}

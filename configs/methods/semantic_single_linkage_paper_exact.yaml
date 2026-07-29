@@ -1,0 +1,10 @@
+name: semantic_single_linkage_paper_exact
+backend_type: mock
+segmenter: sentence
+linkage: single
+distance: weighted_position_and_clipped_cosine
+lambda_weight: 0.5
+target_clusters: 4
+max_cluster_sentences: null
+distance_threshold: 0.5
+implementation_fidelity: paper_reimplementation_unverified

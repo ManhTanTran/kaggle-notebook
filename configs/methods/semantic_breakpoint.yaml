@@ -1,0 +1,9 @@
+name: semantic_breakpoint
+backend_type: mock
+segmenter: sentence
+similarity: cosine
+distance: one_minus_cosine
+threshold: {type: percentile, value: 90}
+min_chunk_tokens: 32
+max_chunk_tokens: null
+merge_small_chunks: true

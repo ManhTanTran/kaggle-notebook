@@ -1,0 +1,8 @@
+name: uit_viquad
+adapter: uit_viquad
+split: validation
+language: vi
+evaluation_profile: qa_evidence_retrieval
+data_path: tests/fixtures/uit_viquad/validation.json
+evidence_policy: sentence_containing_gold_answer
+validation: {fail_on_mapping_error: true, minimum_mapping_rate: 1.0}

@@ -1,0 +1,10 @@
+name: qasper
+adapter: qasper
+split: validation
+language: en
+evaluation_profile: qa_evidence_retrieval
+data_path: data/raw/qasper
+unanswerable_policy: exclude
+validation:
+  fail_on_mapping_error: true
+  minimum_mapping_rate: 0.95

@@ -1,0 +1,19 @@
+[
+  {
+    "_id": "hotpot-q1",
+    "question": "Which city contains the museum founded by Ada?",
+    "answer": "Beta City",
+    "supporting_facts": [["Alpha Museum", 0], ["Beta City", 0]],
+    "context": [
+      ["Alpha Museum", ["Ada founded Alpha Museum."]],
+      ["Beta City", ["Alpha Museum is in Beta City."]]
+    ]
+  },
+  {
+    "_id": "hotpot-q2",
+    "question": "When did Alpha Museum open?",
+    "answer": "1999",
+    "supporting_facts": [["Alpha Museum", 1]],
+    "context": [["Alpha Museum", ["Ada founded Alpha Museum.", "It opened in 1999."]]]
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "data": [
+    {
+      "title": "Hà Nội",
+      "paragraphs": [
+        {
+          "context": "Hà Nội là thủ đô Việt Nam. Thành phố có nhiều hồ đẹp.",
+          "qas": [
+            {
+              "id": "viquad-q1",
+              "question": "Đâu là thủ đô Việt Nam?",
+              "answers": [
+                {"text": "Hà Nội", "answer_start": 0},
+                {"text": "thủ đô", "answer_start": 10}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Huế",
+      "paragraphs": [
+        {
+          "context": "Huế có nhiều di tích. Sông Hương chảy qua thành phố Huế.",
+          "qas": [
+            {
+              "id": "viquad-q2",
+              "question": "Địa danh nào xuất hiện trong đoạn?",
+              "answers": [
+                {"text": "Huế", "answer_start": 0},
+                {"text": "Sông Hương", "answer_start": 22},
+                {"text": "Huế", "answer_start": 52}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

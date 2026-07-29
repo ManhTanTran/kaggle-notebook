@@ -1,0 +1,13 @@
+methods:
+  - {name: fixed_256, chunk_size: 256}
+  - {name: fixed_512, chunk_size: 512}
+  - {name: sentence_fixed_256, chunk_size: 256}
+  - {name: sentence_fixed_512, chunk_size: 512}
+  - {name: semantic_breakpoint, backend_type: mock}
+  - {name: semantic_single_linkage_paper_exact, backend_type: mock}
+  - {name: meta_ppl_raw, backend_type: mock}
+  - {name: meta_ppl_dynamic_512, backend_type: mock, max_chunk_tokens: 512}
+  - {name: pic_paper_reimplementation, backend_type: mock}
+  - {name: pic_reimplementation_capped_512, backend_type: mock, max_chunk_tokens: 512}
+  - {name: late_fixed_256, representation: {backend_type: mock}}
+  - {name: late_fixed_512, representation: {backend_type: mock}}

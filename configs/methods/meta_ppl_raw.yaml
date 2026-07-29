@@ -1,0 +1,7 @@
+name: meta_ppl_raw
+backend_type: mock
+model_name: null
+model_revision: null
+context_policy: all_previous_segments
+prominence: 0.05
+max_chunk_tokens: null

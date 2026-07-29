@@ -1,0 +1,11 @@
+run_name: pic_real_smoke
+dataset: {name: synthetic}
+methods:
+  - {name: pic_paper_reimplementation, backend_type: transformers, summarizer_model_name: google/flan-t5-small, max_new_tokens: 64}
+  - {name: pic_reimplementation_capped_512, backend_type: transformers, summarizer_model_name: google/flan-t5-small, max_new_tokens: 64, max_chunk_tokens: 512}
+embedding: {name: sentence_transformer, model_name: sentence-transformers/all-MiniLM-L6-v2}
+retrieval: {name: cosine}
+evaluation: {k_values: [3, 5, 10], token_budgets: [2048], retrieval_depth: 10, strict_token_budget: true, duplicate_scope: within_document}
+output_dir: outputs
+seed: 42
+smoke: true

@@ -1,0 +1,9 @@
+name: late_fixed_256
+boundary: {type: fixed, chunk_size: 256, overlap: 0}
+representation:
+  type: late_chunking
+  backend_type: mock
+  pooling: mean
+  normalize: true
+  max_model_tokens: 8192
+  long_document_policy: error

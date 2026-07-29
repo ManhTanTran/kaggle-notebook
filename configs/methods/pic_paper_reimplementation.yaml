@@ -1,0 +1,6 @@
+name: pic_paper_reimplementation
+backend_type: mock
+summarizer: deterministic_extractive_mock
+embedding: {inherit_from_experiment: true}
+threshold_policy: mean_summary_similarity
+max_chunk_tokens: null

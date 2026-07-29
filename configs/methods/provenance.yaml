@@ -1,0 +1,57 @@
+methods:
+  semantic_breakpoint:
+    fidelity: idea_based_reimplementation
+    paper_url: https://aclanthology.org/2025.findings-naacl.114/
+    repository_url: null
+    source_commit: null
+    license: null
+    assumptions: ["Deterministic regex segmentation replaces spaCy."]
+  semantic_single_linkage_paper_exact:
+    fidelity: paper_reimplementation_unverified
+    paper_url: https://aclanthology.org/2025.findings-naacl.114/
+    repository_url: null
+    source_commit: null
+    license: null
+    assumptions: ["No official implementation was located."]
+  meta_ppl_raw:
+    fidelity: paper_reimplementation_unverified
+    paper_url: https://arxiv.org/abs/2410.12788
+    repository_url: https://github.com/IAAR-Shanghai/Meta-Chunking
+    source_commit: 2dbf487a75e44a378eef1a35909bdbe871c396a7
+    license: Apache-2.0
+    assumptions: ["Coverage-preserving chunks omit repository overlap duplication."]
+  meta_ppl_dynamic_512:
+    fidelity: idea_based_reimplementation
+    paper_url: https://arxiv.org/abs/2410.12788
+    repository_url: https://github.com/IAAR-Shanghai/Meta-Chunking
+    source_commit: 2dbf487a75e44a378eef1a35909bdbe871c396a7
+    license: Apache-2.0
+    assumptions: ["512 cap is a project policy, not a paper setting."]
+  pic_paper_reimplementation:
+    fidelity: paper_reimplementation_unverified
+    paper_url: https://aclanthology.org/2025.findings-acl.422/
+    repository_url: null
+    source_commit: null
+    license: null
+    assumptions: ["Mock mode does not use the paper's GPT-4o-mini summarizer."]
+  pic_reimplementation_capped_512:
+    fidelity: idea_based_reimplementation
+    paper_url: https://aclanthology.org/2025.findings-acl.422/
+    repository_url: null
+    source_commit: null
+    license: null
+    assumptions: ["512 cap is post-processing beyond PIC's paper protocol."]
+  late_fixed_256:
+    fidelity: paper_reimplementation_unverified
+    paper_url: https://arxiv.org/abs/2409.04701
+    repository_url: https://github.com/jina-ai/late-chunking
+    source_commit: 1d3bb02bf091becd0771455e4e7959463935e26c
+    license: Apache-2.0
+    assumptions: ["No source code is copied from the official repository."]
+  late_fixed_512:
+    fidelity: paper_reimplementation_unverified
+    paper_url: https://arxiv.org/abs/2409.04701
+    repository_url: https://github.com/jina-ai/late-chunking
+    source_commit: 1d3bb02bf091becd0771455e4e7959463935e26c
+    license: Apache-2.0
+    assumptions: ["No source code is copied from the official repository."]
