@@ -4,7 +4,7 @@ split: validation
 language: vi
 evaluation_profile: qa_evidence_retrieval
 data_path: data/raw/uit_viquad
-evidence_policy: sentence_containing_gold_answer
+evidence_policy: minimal_sentence_covering_gold_answer
 validation:
   fail_on_mapping_error: true
   minimum_mapping_rate: 0.95

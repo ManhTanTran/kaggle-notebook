@@ -5,6 +5,7 @@ import pytest
 from chunkbench.common.exceptions import ContractError
 from chunkbench.common.types import DatasetBundle, Document, Evidence, Query
 from chunkbench.config.loader import load_yaml
+from chunkbench.data.uit_viquad_evidence import answer_sentence_groups
 from chunkbench.data.validation import validate_dataset
 from chunkbench.registry.datasets import (
     CORE_DATASETS,
@@ -96,6 +97,54 @@ def test_uit_viquad_sentence_containing_answer_policy():
     assert len(by_query["viquad-q2"]) == 2
     assert by_query["viquad-q2"][0].metadata["answer_start"] == 0
     assert by_query["viquad-q2"][1].metadata["answer_spans"][-1]["answer_start"] == 52
+
+
+def test_uit_viquad_uses_minimal_sentence_cover_for_ellipsis_span():
+    context = (
+        "Mở đầu. Là nơi đặt trụ sở OECD, UNESCO... cộng với hoạt động tài chính "
+        "và du lịch đã khiến Paris trở nên nổi tiếng. Kết thúc."
+    )
+    answer_text = (
+        "Là nơi đặt trụ sở OECD, UNESCO... cộng với hoạt động tài chính và du lịch"
+    )
+    answer_start = context.index(answer_text)
+
+    groups = answer_sentence_groups(
+        context, [{"text": answer_text, "answer_start": answer_start}]
+    )
+
+    assert len(groups) == 1
+    assert context[groups[0]["sentence_start"] : groups[0]["sentence_end"]] == (
+        "Là nơi đặt trụ sở OECD, UNESCO... cộng với hoạt động tài chính "
+        "và du lịch đã khiến Paris trở nên nổi tiếng."
+    )
+
+
+def test_uit_viquad_repairs_one_indexed_answer_start_with_provenance():
+    context = "Mở đầu. Quận 12 ở phía Đông."
+    answer_text = "Quận 12 ở phía Đông"
+    one_indexed_start = context.index(answer_text) - 1
+
+    groups = answer_sentence_groups(
+        context, [{"text": answer_text, "answer_start": one_indexed_start}]
+    )
+
+    span = groups[0]["answer_spans"][0]
+    assert span["answer_start"] == context.index(answer_text)
+    assert span["original_answer_start"] == one_indexed_start
+    assert span["answer_start_repaired"] is True
+
+
+def test_uit_viquad_does_not_split_decimal_punctuation_inside_sentence():
+    context = "Cách đây ít nhất 40.000 năm đã có sự hiện diện của con người."
+    answer_text = "40.000 năm"
+    answer_start = context.index(answer_text)
+
+    groups = answer_sentence_groups(
+        context, [{"text": answer_text, "answer_start": answer_start}]
+    )
+
+    assert context[groups[0]["sentence_start"] : groups[0]["sentence_end"]] == context
 
 
 def test_validation_rejects_out_of_bounds_evidence_span():

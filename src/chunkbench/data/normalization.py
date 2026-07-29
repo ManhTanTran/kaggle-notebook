@@ -20,14 +20,35 @@ def stable_id(prefix: str, value: str) -> str:
 def sentence_spans(text: str) -> list[tuple[int, int]]:
     """Return deterministic sentence character spans without changing text."""
     spans: list[tuple[int, int]] = []
-    for match in re.finditer(r"[^.!?]+(?:[.!?]+(?=\s|$)|$)", text, re.DOTALL):
-        start, end = match.span()
+
+    def append_span(start: int, end: int) -> None:
         while start < end and text[start].isspace():
             start += 1
         while end > start and text[end - 1].isspace():
             end -= 1
         if start < end:
             spans.append((start, end))
+
+    start = 0
+    index = 0
+    while index < len(text):
+        if text[index] not in ".!?":
+            index += 1
+            continue
+        end = index + 1
+        while end < len(text) and text[end] in ".!?":
+            end += 1
+        if end < len(text) and not text[end].isspace():
+            index = end
+            continue
+        punctuation = text[index:end]
+        if punctuation.startswith(".") and len(punctuation) > 1:
+            index = end
+            continue
+        append_span(start, end)
+        start = end
+        index = end
+    append_span(start, len(text))
     return spans
 
 

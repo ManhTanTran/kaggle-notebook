@@ -63,10 +63,15 @@ class UITViQuADAdapter(DatasetAdapter):
                             sentence,
                             len(sentence.split()),
                             {
-                                "granularity": "sentence",
+                                "granularity": (
+                                    "sentence"
+                                    if group["sentence_count"] == 1
+                                    else "sentence_window"
+                                ),
                                 "char_spans": [[start, end]],
                                 "sentence_start": start,
                                 "sentence_end": end,
+                                "sentence_count": group["sentence_count"],
                                 "answer_spans": answer_spans,
                                 "answer_text": answer_spans[0]["answer_text"],
                                 "answer_start": answer_spans[0]["answer_start"],
