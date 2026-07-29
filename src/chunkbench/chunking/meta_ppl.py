@@ -64,7 +64,17 @@ class MetaPPLChunker(BaseChunker):
             return []
         scores: list[float] = []
         for index, segment in enumerate(segments):
-            context = " ".join(item.text for item in segments[:index])
+            if self.context_policy == "all_previous_segments":
+                context_segments = segments[:index]
+            elif self.context_policy == "previous_segment":
+                context_segments = segments[max(0, index - 1) : index]
+            elif self.context_policy == "none":
+                context_segments = []
+            else:
+                raise ValueError(
+                    "Unknown Meta-PPL context_policy: " f"{self.context_policy}"
+                )
+            context = " ".join(item.text for item in context_segments)
             scores.append(self.scorer.score_transition(context, segment.text))
         boundary_after = find_local_minima(scores, self.prominence)
         groups = contiguous_groups(segments, boundary_after)

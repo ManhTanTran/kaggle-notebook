@@ -41,6 +41,7 @@ class TransformersPerplexityScorer(BasePerplexityScorer):
         model_revision: str | None = None,
         device: str | None = None,
         precision: str | None = None,
+        max_sequence_tokens: int | None = None,
     ) -> None:
         try:
             import torch
@@ -58,22 +59,37 @@ class TransformersPerplexityScorer(BasePerplexityScorer):
         self.model.to(self.device)
         self.model.eval()
         self._torch = torch
+        configured_limit = max_sequence_tokens or getattr(
+            self.model.config, "n_positions", None
+        )
+        self.max_sequence_tokens = int(configured_limit or 1024)
+        if self.max_sequence_tokens > 100_000:
+            self.max_sequence_tokens = 1024
         self._cache: dict[tuple[str, str], float] = {}
 
     def score_transition(self, left_context: str, candidate_segment: str) -> float:
         key = (left_context, candidate_segment)
         if key in self._cache:
             return self._cache[key]
-        text = f"{left_context} {candidate_segment}".strip()
-        encoded = self.tokenizer(text, return_tensors="pt")
+        context_ids = self.tokenizer(left_context, add_special_tokens=False)[
+            "input_ids"
+        ]
         candidate_ids = self.tokenizer(candidate_segment, add_special_tokens=False)[
             "input_ids"
         ]
         if not candidate_ids:
             return 0.0
-        encoded = {key: value.to(self.device) for key, value in encoded.items()}
+        candidate_ids = candidate_ids[-self.max_sequence_tokens :]
+        context_limit = self.max_sequence_tokens - len(candidate_ids)
+        input_ids = context_ids[-context_limit:] + candidate_ids
+        encoded = {
+            "input_ids": self._torch.tensor([input_ids], device=self.device),
+            "attention_mask": self._torch.ones(
+                (1, len(input_ids)), dtype=self._torch.long, device=self.device
+            ),
+        }
         labels = encoded["input_ids"].clone()
-        labels[:, : max(0, labels.shape[1] - len(candidate_ids))] = -100
+        labels[:, : len(input_ids) - len(candidate_ids)] = -100
         with self._torch.inference_mode():
             output = self.model(**encoded, labels=labels)
         score = float(math.exp(float(output.loss)))

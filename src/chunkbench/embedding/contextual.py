@@ -97,6 +97,7 @@ class TransformersContextualEmbedder(BaseContextualEmbedder):
         device: str | None = None,
         max_model_tokens: int = 8192,
         long_document_policy: str = "error",
+        window_stride: int = 64,
     ) -> None:
         try:
             import torch
@@ -115,6 +116,68 @@ class TransformersContextualEmbedder(BaseContextualEmbedder):
         self.model.eval()
         self.max_model_tokens = max_model_tokens
         self.long_document_policy = long_document_policy
+        self.window_stride = int(window_stride)
+
+    def _encode_single(self, encoded: dict[str, object]) -> ContextualDocument:
+        """Run one tokenized model window and preserve its source offsets."""
+        offsets_tensor = encoded.pop("offset_mapping")
+        offsets = [tuple(item) for item in offsets_tensor[0].tolist()]
+        encoded = {key: value.to(self.device) for key, value in encoded.items()}
+        with self._torch.inference_mode():
+            vectors = (
+                self.model(**encoded)
+                .last_hidden_state[0]
+                .detach()
+                .cpu()
+                .numpy()
+                .astype(np.float32)
+            )
+        attention = [
+            bool(item) for item in encoded["attention_mask"][0].detach().cpu().tolist()
+        ]
+        special = [start == end for start, end in offsets]
+        return ContextualDocument(vectors, offsets, attention, special)
+
+    def _encode_windows(self, document: Document) -> ContextualDocument:
+        """Encode overlapping windows and retain the first state per token offset."""
+        stride = min(max(0, self.window_stride), self.max_model_tokens - 1)
+        encoded = self.tokenizer(
+            document.text,
+            return_offsets_mapping=True,
+            return_overflowing_tokens=True,
+            return_tensors="pt",
+            truncation=True,
+            max_length=self.max_model_tokens,
+            stride=stride,
+            padding=True,
+        )
+        encoded.pop("overflow_to_sample_mapping", None)
+        states_by_offset: dict[tuple[int, int], NDArray[np.float32]] = {}
+        window_count = int(encoded["input_ids"].shape[0])
+        for index in range(window_count):
+            window = {key: value[index : index + 1] for key, value in encoded.items()}
+            state = self._encode_single(window)
+            for vector, offset, attended, special in zip(
+                state.vectors,
+                state.offsets,
+                state.attention_mask,
+                state.special_tokens,
+                strict=True,
+            ):
+                if attended and not special:
+                    states_by_offset.setdefault(offset, vector)
+        if not states_by_offset:
+            raise ValueError("Late chunking window encoder produced no document tokens")
+        offsets = sorted(states_by_offset)
+        vectors = np.vstack([states_by_offset[offset] for offset in offsets]).astype(
+            np.float32
+        )
+        return ContextualDocument(
+            vectors,
+            offsets,
+            [True] * len(offsets),
+            [False] * len(offsets),
+        )
 
     def encode_document(self, document: Document) -> ContextualDocument:
         encoded = self.tokenizer(
@@ -136,23 +199,10 @@ class TransformersContextualEmbedder(BaseContextualEmbedder):
                 truncation=True,
                 max_length=self.max_model_tokens,
             )
+        elif count > self.max_model_tokens and self.long_document_policy == "window":
+            return self._encode_windows(document)
         elif count > self.max_model_tokens:
             raise ValueError(
-                "Only error and truncate long-document policies are available"
+                "Only error, truncate, and window long-document policies are available"
             )
-        offsets = [tuple(item) for item in encoded.pop("offset_mapping")[0].tolist()]
-        encoded = {key: value.to(self.device) for key, value in encoded.items()}
-        with self._torch.inference_mode():
-            vectors = (
-                self.model(**encoded)
-                .last_hidden_state[0]
-                .detach()
-                .cpu()
-                .numpy()
-                .astype(np.float32)
-            )
-        attention = [
-            bool(item) for item in encoded["attention_mask"][0].detach().cpu().tolist()
-        ]
-        special = [start == end for start, end in offsets]
-        return ContextualDocument(vectors, offsets, attention, special)
+        return self._encode_single(encoded)

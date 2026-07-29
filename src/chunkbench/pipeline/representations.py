@@ -127,6 +127,7 @@ def build_representation_strategy(
             long_document_policy=str(
                 representation.get("long_document_policy", "error")
             ),
+            window_stride=int(representation.get("window_stride", 64)),
         )
     else:
         raise ValueError(f"Unknown late backend_type: {backend_type}")

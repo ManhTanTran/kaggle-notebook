@@ -141,6 +141,7 @@ def _meta(variant: str) -> Factory:
                 clean.pop("model_revision", None),
                 clean.pop("device", None),
                 clean.pop("precision", None),
+                clean.pop("max_sequence_tokens", None),
             )
         else:
             raise ValueError(f"Unknown Meta-PPL backend_type: {backend_type}")
