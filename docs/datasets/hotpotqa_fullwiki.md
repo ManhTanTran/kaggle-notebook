@@ -10,5 +10,12 @@
 - Corpus lookup: stable Unicode/casefold title normalization and streaming lookup;
   the adapter does not load the entire raw corpus to find requested titles.
 - Verification: official-schema local fixture verified.
-- FullWiki limitation: full corpus retrieval has not been executed; current
-  adapter materializes the supporting-title subset selected by the questions.
+- Kaggle Hugging Face mode: the Vietnamese Kaggle notebook can download
+  `hotpotqa/hotpot_qa`, config `fullwiki`, split `validation`, then materialize
+  the union of article contexts in that split. This is a
+  `global_supporting_document_subset`, with official supporting-fact sentence
+  labels preserved and validated.
+- FullWiki limitation: this mode is **not** retrieval from the official full
+  processed-Wikipedia corpus. Report it as a HotpotQA supporting-document
+  subset chunk/evidence-retrieval benchmark, never as a FullWiki retrieval
+  result.
