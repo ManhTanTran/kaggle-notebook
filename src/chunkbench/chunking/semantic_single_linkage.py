@@ -31,16 +31,17 @@ def select_single_link_merge(
     clusters: list[set[int]], matrix: np.ndarray
 ) -> tuple[int, int, float] | None:
     """Return the globally smallest cluster pair with deterministic tie-breaking."""
-    candidate: tuple[float, int, int] | None = None
+    candidate: tuple[float, int, int, int, int] | None = None
     for left in range(len(clusters)):
         for right in range(left + 1, len(clusters)):
             value = min(matrix[a, b] for a in clusters[left] for b in clusters[right])
-            key = (float(value), min(clusters[left]), min(clusters[right]))
+            first_id, second_id = sorted((min(clusters[left]), min(clusters[right])))
+            key = (float(value), first_id, second_id, left, right)
             if candidate is None or key < candidate:
                 candidate = key
     if candidate is None:
         return None
-    return candidate[1], candidate[2], candidate[0]
+    return candidate[3], candidate[4], candidate[0]
 
 
 class SemanticSingleLinkageChunker(BaseChunker):
