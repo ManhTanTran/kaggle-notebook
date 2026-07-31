@@ -98,3 +98,16 @@ def test_notebooks_contain_no_function_or_class_implementation():
             isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
             for node in ast.walk(tree)
         )
+
+
+def test_kaggle_hotpot_conversion_uses_contexts_containing_gold_documents():
+    notebook = json.loads(
+        Path("notebooks/05_kaggle_benchmark_vi.ipynb").read_text(encoding="utf-8")
+    )
+    source = "\n".join(
+        "".join(cell.get("source", []))
+        for cell in notebook["cells"]
+        if cell["cell_type"] == "code"
+    )
+    assert 'hotpot_config = "distractor"' in source
+    assert 'hotpot_config = "fullwiki"' not in source

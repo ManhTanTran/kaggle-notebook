@@ -7,13 +7,21 @@ from pathlib import Path
 
 def normalize_title(title: str) -> str:
     """Normalize an article title for stable, case-insensitive lookup."""
+    return normalize_wikipedia_title(title).casefold()
+
+
+def normalize_wikipedia_title(title: str) -> str:
+    """Normalize spacing while preserving Wikipedia's case-sensitive identity."""
     normalized = unicodedata.normalize("NFC", title).replace("_", " ")
-    return " ".join(normalized.split()).casefold()
+    return " ".join(normalized.split())
 
 
-def stable_id(prefix: str, value: str) -> str:
+def stable_id(prefix: str, value: str, *, case_sensitive: bool = False) -> str:
     """Build a readable stable identifier from source text."""
-    slug = re.sub(r"[^\w]+", "-", normalize_title(value), flags=re.UNICODE).strip("-")
+    normalized = (
+        normalize_wikipedia_title(value) if case_sensitive else normalize_title(value)
+    )
+    slug = re.sub(r"[^\w]+", "-", normalized, flags=re.UNICODE).strip("-")
     return f"{prefix}:{slug}"
 
 

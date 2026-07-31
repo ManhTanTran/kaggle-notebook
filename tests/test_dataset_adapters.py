@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -82,6 +83,50 @@ def test_hotpot_and_vimqa_preserve_multi_hop_supporting_facts():
         assert all(
             item.metadata["granularity"] == "sentence" for item in first_evidence
         )
+
+
+def test_hotpot_preserves_case_sensitive_wikipedia_title_identity(tmp_path: Path):
+    questions_path = tmp_path / "validation.json"
+    corpus_path = tmp_path / "articles.jsonl"
+    questions_path.write_text(
+        json.dumps(
+            [
+                {
+                    "_id": "case-sensitive",
+                    "question": "Which page is the magazine?",
+                    "answer": "Popular Science",
+                    "supporting_facts": [["Popular Science", 0]],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    articles = [
+        {
+            "title": "Popular Science",
+            "text": [["Popular Science is an American magazine."]],
+        },
+        {
+            "title": "Popular science",
+            "text": [["Popular science explains science to a general audience."]],
+        },
+    ]
+    corpus_path.write_text(
+        "\n".join(json.dumps(article) for article in articles) + "\n",
+        encoding="utf-8",
+    )
+
+    bundle = build_dataset_adapter(
+        "hotpotqa_fullwiki",
+        {
+            "questions_path": str(questions_path),
+            "corpus_path": str(corpus_path),
+            "split": "validation",
+        },
+    ).load()
+
+    assert bundle.evidence[0].text == "Popular Science is an American magazine."
+    assert bundle.evidence[0].metadata["article_title"] == "Popular Science"
 
 
 def test_uit_viquad_sentence_containing_answer_policy():

@@ -6,7 +6,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, TextIO
 
-from chunkbench.data.normalization import normalize_title
+from chunkbench.data.normalization import normalize_wikipedia_title
 
 
 def _open_text(path: Path) -> TextIO:
@@ -44,7 +44,7 @@ def lookup_articles(
     """Stream until all requested normalized titles have been found."""
     found: dict[str, dict[str, Any]] = {}
     for article in iter_articles(path):
-        key = normalize_title(str(article["title"]))
+        key = normalize_wikipedia_title(str(article["title"]))
         if key in normalized_titles and key not in found:
             found[key] = article
             if len(found) == len(normalized_titles):

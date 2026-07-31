@@ -10,7 +10,7 @@ from chunkbench.data.hotpotqa_corpus import (
 )
 from chunkbench.data.hotpotqa_evidence import supporting_evidence
 from chunkbench.data.hotpotqa_parser import load_questions
-from chunkbench.data.normalization import normalize_title, stable_id
+from chunkbench.data.normalization import normalize_wikipedia_title, stable_id
 
 
 class HotpotQAFullWikiAdapter(DatasetAdapter):
@@ -23,7 +23,7 @@ class HotpotQAFullWikiAdapter(DatasetAdapter):
         corpus_path = Path(str(self.config["corpus_path"]))
         questions = load_questions(questions_path)
         needed_titles = {
-            normalize_title(str(title))
+            normalize_wikipedia_title(str(title))
             for item in questions
             for title, _ in item.get("supporting_facts", [])
         }
@@ -36,7 +36,7 @@ class HotpotQAFullWikiAdapter(DatasetAdapter):
         for normalized_title in sorted(raw_articles):
             article = raw_articles[normalized_title]
             title = str(article["title"])
-            document_id = stable_id("hotpotqa", title)
+            document_id = stable_id("hotpotqa", title, case_sensitive=True)
             text, sentences, locators = normalize_article(article)
             article_data[normalized_title] = (
                 document_id,
@@ -64,7 +64,8 @@ class HotpotQAFullWikiAdapter(DatasetAdapter):
                 raise ValueError(f"HotpotQA query {query_id} has no supporting_facts")
             relevant_ids = tuple(
                 dict.fromkeys(
-                    article_data[normalize_title(str(title))][0] for title, _ in facts
+                    article_data[normalize_wikipedia_title(str(title))][0]
+                    for title, _ in facts
                 )
             )
             queries.append(
@@ -77,7 +78,7 @@ class HotpotQAFullWikiAdapter(DatasetAdapter):
             )
             for index, (title, sentence_index) in enumerate(facts):
                 document_id, canonical_title, sentences, locators = article_data[
-                    normalize_title(str(title))
+                    normalize_wikipedia_title(str(title))
                 ]
                 evidence.append(
                     supporting_evidence(
