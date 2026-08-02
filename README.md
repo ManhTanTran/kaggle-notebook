@@ -94,3 +94,22 @@ workspace is a Git repository.
 Open the workspace root and select the `chunkbench` kernel. Keep raw datasets,
 weights, indices, credentials, and outputs out of Git. The fixture matrix is the
 portable pre-commit smoke test.
+
+## Hybrid Hierarchical Retrieval on DAPR
+
+The repository also contains the Phase 1 HHR benchmark as a separate
+`hhr_dapr` package. Its reusable adapters, sparse/dense retrieval, hierarchical
+runner, metrics, protocol guards, and artifact export live in `src/hhr_dapr`.
+The orchestration notebook is
+`notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb`.
+
+Run its deterministic offline smoke test with:
+
+```bash
+python -m pip install -e ".[dev,hhr]"
+jupyter notebook notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb
+```
+
+Install `.[hhr-dense]` for DRAGON+/FAISS benchmark runs. Real DAPR corpora are
+not committed; the normalized manifest contract and Phase 1 protocol are in
+`docs/hhr_dapr/`.
