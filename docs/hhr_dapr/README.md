@@ -1,59 +1,54 @@
 # Phase 1 HHR × DAPR benchmark
 
-This benchmark separates the research contract (`docs/hhr_dapr/`), notebook orchestration (`notebooks/hhr_dapr/`), and reusable implementation (`src/hhr_dapr/`). The checked-in notebook defaults to a deterministic synthetic smoke run. It does not contain or invent DAPR benchmark results.
+The Kaggle notebook owns everything specific to DAPR: Hugging Face download,
+official-schema normalization, validation, query sampling, zero-shot protocol,
+NQ-hard categories, and the synthetic smoke fixture. The reusable `src/hhr_dapr`
+package owns retrieval, metrics, experiment execution, caching, and artifacts.
 
-## Quick start
+## Kaggle: notebook-only workflow
+
+1. Push this repository to GitHub.
+2. In Kaggle, create a notebook and enable **Internet**. A GPU is recommended for
+   real dense runs but is unnecessary for smoke mode.
+3. Import
+   `notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb` from GitHub, or upload that file.
+4. Run all cells unchanged. The default smoke run clones the repository when
+   needed, installs dependencies, and validates the full pipeline without
+   downloading DAPR.
+5. Edit only the central configuration cell. Change `run_mode` to `baseline` or
+   `full`; initially override `datasets` with one dataset and optionally set a
+   query sample size.
+6. Run all again. Real modes download the pinned
+   [`UKPLab/dapr`](https://huggingface.co/datasets/UKPLab/dapr) revision through
+   `datasets.load_dataset` and cache it under `/kaggle/working/cache`.
+7. Download the artifact directory printed by section 16 from Kaggle Output.
+
+MIRACL and Genomics contain millions of passages. Query sampling reduces query
+execution but not the corpus index, so the complete matrix can exceed a single
+Kaggle session. Do not interpret synthetic smoke metrics as benchmark results.
+
+## Local workflow
 
 ```powershell
 python -m pip install -e ".[dev,hhr]"
-pytest
+python -m pytest
 jupyter notebook notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb
 ```
 
-Run the notebook top-to-bottom unchanged first. For a real run, populate DAPR artifacts, change the central cell to `baseline` or `full`, and install the `hhr-dense` extras.
+The paired `01_phase1_hhr_dapr.py` is the text source used to review and rebuild
+the notebook. Dataset-specific functions remain notebook-local, not reusable
+package APIs.
 
-## Real-data directory contract
+## Normalized boundary
 
-Create one directory for each of `ms_marco`, `natural_questions`, `miracl_en`, `genomics`, `conditional_qa`, and `nq_hard`:
+The reusable runner accepts any object with `name`, `documents`, `passages`,
+`queries`, `qrels`, and optional `query_metadata` attributes. The notebook emits:
 
-```text
-data/dapr/<dataset>/
-├─ manifest.json
-├─ documents.parquet
-├─ passages.parquet
-├─ queries.parquet
-├─ qrels.parquet
-└─ query_metadata.parquet  # optional; expected for NQ-hard categories
-```
+- documents: `document_id`, `title`, `text`
+- passages: `passage_id`, `document_id`, `passage_text`, `passage_position`
+- queries: `query_id`, `query_text`, `dataset`, `split`
+- qrels: `query_id`, `passage_id`, `relevance`
 
-Example manifest:
-
-```json
-{
-  "documents": "documents.parquet",
-  "passages": "passages.parquet",
-  "queries": "queries.parquet",
-  "qrels": "qrels.parquet",
-  "query_metadata": "query_metadata.parquet",
-  "column_maps": {
-    "documents": {"document_id": "docid", "title": "title", "text": "body"},
-    "passages": {"passage_id": "pid", "document_id": "docid", "passage_text": "text", "passage_position": "position"},
-    "queries": {"query_id": "qid", "query_text": "query", "dataset": "dataset", "split": "split"},
-    "qrels": {"query_id": "qid", "passage_id": "pid", "relevance": "score"},
-    "query_metadata": {"query_id": "qid", "question_type": "category"}
-  }
-}
-```
-
-When files already use normalized names, omit `column_maps`. NQ-hard `question_type` may contain multiple labels separated by commas, pipes, semicolons, or whitespace; diagnostics count a query in every applicable category.
-
-## Outputs
-
-Each execution writes beneath:
-
-```text
-outputs/<experiment_name>/<run_mode>/<git_commit_or_timestamp>/
-```
-
-The exporter writes all required tables and marks unexecuted matrix entries as `not_run`. Index caches are stored separately under `cache/` and are excluded from version control.
-BM25 structures, dense embeddings, and FAISS document indices are fingerprinted and reused unless `rebuild_indices=True`.
+Artifacts are written under
+`outputs/<experiment_name>/<run_mode>/<git_commit_or_timestamp>/`. Unscheduled
+matrix entries are marked `not_run`, and smoke metadata is explicitly synthetic.

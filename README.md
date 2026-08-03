@@ -97,10 +97,11 @@ portable pre-commit smoke test.
 
 ## Hybrid Hierarchical Retrieval on DAPR
 
-The repository also contains the Phase 1 HHR benchmark as a separate
-`hhr_dapr` package. Its reusable adapters, sparse/dense retrieval, hierarchical
-runner, metrics, protocol guards, and artifact export live in `src/hhr_dapr`.
-The orchestration notebook is
+The repository also contains the Phase 1 HHR benchmark. Dataset-agnostic
+sparse/dense retrieval, the hierarchical runner, metrics, caching, and artifact
+export live in `src/hhr_dapr`. Hugging Face DAPR download, normalization,
+validation, sampling, protocol controls, and NQ-hard diagnostics intentionally
+live in the orchestration notebook:
 `notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb`.
 
 Run its deterministic offline smoke test with:
@@ -110,6 +111,7 @@ python -m pip install -e ".[dev,hhr]"
 jupyter notebook notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb
 ```
 
-Install `.[hhr-dense]` for DRAGON+/FAISS benchmark runs. Real DAPR corpora are
-not committed; the normalized manifest contract and Phase 1 protocol are in
-`docs/hhr_dapr/`.
+The notebook can be uploaded by itself to Kaggle: with Internet enabled it clones
+this repository and installs the required extras. Real modes download the pinned
+`UKPLab/dapr` Hugging Face revision; no corpora are committed. See
+`docs/hhr_dapr/` for the workflow and Phase 1 protocol.

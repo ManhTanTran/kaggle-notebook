@@ -6,7 +6,12 @@ Select the strongest document-retriever + passage-retriever configuration before
 
 ## Data contract
 
-Each real dataset lives under `data/dapr/<dataset>/manifest.json`. The manifest points to documents, passages, queries, qrels, and optional query metadata tables. Source columns may be mapped to the normalized names documented in `README.md`. The loader validates IDs, references, relevance labels, passage positions, and counts before retrieval.
+The notebook downloads a pinned revision of `UKPLab/dapr` directly from Hugging
+Face. Its notebook-local normalizers map the official docs, corpus, queries,
+qrels, and NQ-hard configurations to the structural interface consumed by the
+reusable runner. Validation checks IDs, references, relevance labels, passage
+positions, and counts before retrieval. Dataset-specific assumptions do not live
+in `src/hhr_dapr`.
 
 ## Evaluation protocol
 
@@ -22,4 +27,4 @@ Benchmark runs default to the asymmetric DRAGON+ checkpoints `facebook/dragon-pl
 
 ## Phase 2 interface
 
-`HHRPipeline` accepts an optional reranker implementing `rerank(query, rankings, passages)`. Dataset adapters, metrics, the experiment registry, and artifact schemas do not change when a cross-encoder is added.
+`HHRPipeline` accepts an optional reranker implementing `rerank(query, rankings, passages)`. Normalization, metrics, the experiment registry, and artifact schemas do not change when a cross-encoder is added.

@@ -127,6 +127,7 @@ class HashingDualEncoder:
         if dimensions <= 0:
             raise ValueError("dimensions must be positive")
         self.dimensions = dimensions
+        self.cache_key = f"hashing:{dimensions}:v1"
 
     def _encode(self, texts: Sequence[str]) -> np.ndarray:
         matrix = np.zeros((len(texts), self.dimensions), dtype=np.float32)
@@ -157,7 +158,13 @@ class TransformerDualEncoder:
     """Asymmetric Hugging Face encoder using CLS vectors and tokenizer truncation."""
 
     def __init__(
-        self, query_model: str, context_model: str, batch_size: int, device: str
+        self,
+        query_model: str,
+        context_model: str,
+        query_revision: str,
+        context_revision: str,
+        batch_size: int,
+        device: str,
     ):
         try:
             import torch
@@ -170,12 +177,30 @@ class TransformerDualEncoder:
         self.torch = torch
         self.batch_size = batch_size
         self.device = device
+        self.query_model_id = query_model
+        self.context_model_id = context_model
+        self.query_revision = query_revision
+        self.context_revision = context_revision
+        self.cache_key = (
+            f"transformers:{query_model}@{query_revision}:"
+            f"{context_model}@{context_revision}:cls:v1"
+        )
         try:
-            self.query_tokenizer = AutoTokenizer.from_pretrained(query_model)
-            self.context_tokenizer = AutoTokenizer.from_pretrained(context_model)
-            self.query_model = AutoModel.from_pretrained(query_model).to(device).eval()
+            self.query_tokenizer = AutoTokenizer.from_pretrained(
+                query_model, revision=query_revision
+            )
+            self.context_tokenizer = AutoTokenizer.from_pretrained(
+                context_model, revision=context_revision
+            )
+            self.query_model = (
+                AutoModel.from_pretrained(query_model, revision=query_revision)
+                .to(device)
+                .eval()
+            )
             self.context_model = (
-                AutoModel.from_pretrained(context_model).to(device).eval()
+                AutoModel.from_pretrained(context_model, revision=context_revision)
+                .to(device)
+                .eval()
             )
         except Exception as exc:
             raise RuntimeError(
@@ -222,6 +247,10 @@ class TransformerDualEncoder:
         return matrix, {
             "truncation_rate": float(truncated / len(texts)) if texts else 0.0,
             "tokenizer_max_length": max_length,
+            "query_model": self.query_model_id,
+            "query_revision": self.query_revision,
+            "context_model": self.context_model_id,
+            "context_revision": self.context_revision,
         }
 
     def encode_queries(self, texts: Sequence[str]) -> np.ndarray:
@@ -241,6 +270,8 @@ def make_dense_encoder(
     return TransformerDualEncoder(
         config.dense_query_model,
         config.dense_context_model,
+        config.dense_query_revision,
+        config.dense_context_revision,
         config.dense_batch_size,
         config.dense_device,
     )
@@ -350,9 +381,7 @@ class DenseDocumentRetriever:
         k = min(k, len(self.ids))
         if self.faiss_index is not None:
             scores, positions = self.faiss_index.search(query_vector, k)
-            pairs = list(
-                zip(positions[0].tolist(), scores[0].tolist(), strict=True)
-            )
+            pairs = list(zip(positions[0].tolist(), scores[0].tolist(), strict=True))
         else:
             scores = self.embeddings @ query_vector[0]
             order = sorted(
@@ -474,7 +503,9 @@ def _load_or_encode(
         fingerprint.update(b"\0")
         fingerprint.update(str(text).encode("utf-8"))
         fingerprint.update(b"\0")
-    fingerprint.update(type(encoder).__name__.encode("utf-8"))
+    fingerprint.update(
+        str(getattr(encoder, "cache_key", type(encoder).__name__)).encode("utf-8")
+    )
     stem = f"{namespace}_{fingerprint.hexdigest()[:16]}"
     matrix_path = cache_dir / f"{stem}.npy"
     metadata_path = cache_dir / f"{stem}.json"

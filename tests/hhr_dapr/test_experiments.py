@@ -2,15 +2,6 @@ from __future__ import annotations
 
 from hhr_dapr.config import ALL_METHODS
 from hhr_dapr.experiments import build_experiment_registry, run_hhr_experiment
-from hhr_dapr.schema import sample_queries
-
-
-def test_deterministic_smoke_sampling(synthetic_dataset):
-    first = sample_queries(synthetic_dataset, 2, seed=17)
-    second = sample_queries(synthetic_dataset, 2, seed=17)
-    assert first.queries["query_id"].tolist() == second.queries["query_id"].tolist()
-    assert set(first.qrels["query_id"]) == set(first.queries["query_id"])
-    assert set(first.queries["split"]) == {"test"}
 
 
 def test_experiment_registry_is_complete(smoke_config):

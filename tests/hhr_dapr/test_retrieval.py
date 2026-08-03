@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 from hhr_dapr.retrieval import (
+    DenseDocumentRetriever,
+    HashingDualEncoder,
     SparseDocumentRetriever,
     SparsePassageRetriever,
     hhr_interleave,
@@ -57,3 +61,22 @@ def test_sparse_indices_resume_from_cache(synthetic_dataset, smoke_config):
     assert [hit["item_id"] for hit in first.retrieve("Mars", 2)] == [
         hit["item_id"] for hit in second.retrieve("Mars", 2)
     ]
+
+
+def test_dense_cache_key_changes_with_encoder_configuration(
+    synthetic_dataset, smoke_config
+):
+    first = DenseDocumentRetriever(
+        synthetic_dataset.documents,
+        smoke_config,
+        HashingDualEncoder(64),
+        "synthetic",
+    )
+    changed = replace(smoke_config, hashing_features=128)
+    second = DenseDocumentRetriever(
+        synthetic_dataset.documents,
+        changed,
+        HashingDualEncoder(128),
+        "synthetic",
+    )
+    assert first.cache_path != second.cache_path
