@@ -85,8 +85,6 @@ def environment_payload() -> dict[str, Any]:
                 "torch",
                 "transformers",
                 "faiss-cpu",
-                "datasets",
-                "huggingface-hub",
             )
         },
         "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
@@ -142,7 +140,9 @@ def _append_not_run(
     columns: list[str],
     expected_pairs: Iterable[tuple[str, str]],
 ) -> pd.DataFrame:
-    existing = set(zip(frame.get("dataset", []), frame.get("method", []), strict=False))
+    existing = set(
+        zip(frame.get("dataset", []), frame.get("method", []), strict=False)
+    )
     rows = [
         {"dataset": dataset, "method": method, "status": "not_run"}
         for dataset, method in expected_pairs
@@ -180,7 +180,6 @@ def export_run_artifacts(
     expected_pairs: Iterable[tuple[str, str]],
     nq_category_results: pd.DataFrame | None = None,
     git_commit: str | None = None,
-    synthetic_smoke: bool = False,
 ) -> dict[str, Path]:
     run_dir = Path(run_dir).resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -244,10 +243,10 @@ def export_run_artifacts(
         "status": "completed",
         "created_at_utc": now,
         "git_commit": git_commit,
-        "synthetic_smoke": synthetic_smoke,
+        "synthetic_smoke": config.use_synthetic_data,
         "result_count": len(results),
         "note": "Synthetic smoke metrics validate plumbing only."
-        if synthetic_smoke
+        if config.use_synthetic_data
         else None,
     }
     paths = {

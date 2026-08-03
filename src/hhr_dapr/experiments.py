@@ -4,27 +4,17 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from typing import Any, Literal, Protocol
+from typing import Any, Literal
 
 import pandas as pd
 
 from .config import ALL_METHODS, RunConfig, validate_config
 from .metrics import aggregate_query_metrics, document_qrels, evaluate_rankings
 from .retrieval import HHRPipeline, build_retrievers
+from .schema import NormalizedDAPRDataset, validate_dataset
 
 Method = Literal["sparse", "dense", "combined"]
 CombinedStrategy = Literal["hhr_interleave", "rrf"]
-
-
-class RetrievalDatasetLike(Protocol):
-    """Structural input contract; dataset-specific normalization lives upstream."""
-
-    name: str
-    documents: pd.DataFrame
-    passages: pd.DataFrame
-    queries: pd.DataFrame
-    qrels: pd.DataFrame
-    query_metadata: pd.DataFrame | None
 
 
 @dataclass(frozen=True)
@@ -67,12 +57,13 @@ def build_experiment_registry(config: RunConfig) -> dict[str, HHRExperiment]:
 
 
 def run_hhr_experiment(
-    dataset: RetrievalDatasetLike,
+    dataset: NormalizedDAPRDataset,
     experiment: HHRExperiment,
     config: RunConfig,
     retrievers: dict[str, dict[str, Any]] | None = None,
 ) -> ExperimentResult:
     validate_config(config)
+    validate_dataset(dataset)
     if (
         experiment.document_top_k != config.document_top_k
         or experiment.passage_top_k != config.passage_top_k
@@ -227,7 +218,7 @@ def run_hhr_experiment(
 
 
 def run_experiment_matrix(
-    datasets: list[RetrievalDatasetLike], config: RunConfig
+    datasets: list[NormalizedDAPRDataset], config: RunConfig
 ) -> list[ExperimentResult]:
     registry = build_experiment_registry(config)
     results: list[ExperimentResult] = []

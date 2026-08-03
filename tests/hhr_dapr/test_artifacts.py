@@ -7,6 +7,7 @@ import pandas as pd
 from hhr_dapr.artifacts import export_run_artifacts
 from hhr_dapr.config import ALL_METHODS
 from hhr_dapr.experiments import build_experiment_registry, run_hhr_experiment
+from hhr_dapr.schema import dataset_audit
 
 
 def test_artifact_schema_and_not_run_status(tmp_path, synthetic_dataset, smoke_config):
@@ -18,19 +19,8 @@ def test_artifact_schema_and_not_run_status(tmp_path, synthetic_dataset, smoke_c
         run_dir,
         smoke_config,
         [result],
-        pd.DataFrame(
-            [
-                {
-                    "dataset": synthetic_dataset.name,
-                    "documents": len(synthetic_dataset.documents),
-                    "passages": len(synthetic_dataset.passages),
-                    "queries": len(synthetic_dataset.queries),
-                    "qrels": len(synthetic_dataset.qrels),
-                }
-            ]
-        ),
+        pd.DataFrame([dataset_audit(synthetic_dataset)]),
         expected,
-        synthetic_smoke=True,
     )
     assert set(paths) == {
         "config",

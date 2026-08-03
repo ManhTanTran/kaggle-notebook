@@ -1,7 +1,8 @@
-"""Dataset-agnostic graded retrieval metrics."""
+"""Graded retrieval metrics and NQ-hard multi-label diagnostics."""
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable
 
 import numpy as np
@@ -98,3 +99,42 @@ def document_qrels(qrels: pd.DataFrame, passages: pd.DataFrame) -> pd.DataFrame:
         .max()
         .sort_values(["query_id", "document_id"])
     )
+
+
+def category_labels(value: object) -> set[str]:
+    if value is None or (isinstance(value, float) and np.isnan(value)):
+        return set()
+    allowed = {"CR", "MT", "MHR", "AC"}
+    return {
+        part.upper()
+        for part in re.split(r"[,;|\s]+", str(value).strip())
+        if part.upper() in allowed
+    }
+
+
+def nq_hard_by_category(
+    per_query: pd.DataFrame, metadata: pd.DataFrame
+) -> pd.DataFrame:
+    merged = per_query.merge(
+        metadata.loc[:, ["query_id", "question_type"]], on="query_id", how="left"
+    )
+    rows: list[dict[str, float | int | str]] = []
+    categories = ("overall", "CR", "MT", "MHR", "AC")
+    for category in categories:
+        selected = (
+            merged
+            if category == "overall"
+            else merged.loc[
+                merged["question_type"].map(
+                    lambda value, selected=category: selected in category_labels(value)
+                )
+            ]
+        )
+        row: dict[str, float | int | str] = {
+            "category": category,
+            "query_count": int(len(selected)),
+        }
+        for metric in ("passage_ndcg@10", "passage_recall@100"):
+            row[metric] = float(selected[metric].mean()) if len(selected) else np.nan
+        rows.append(row)
+    return pd.DataFrame(rows)
