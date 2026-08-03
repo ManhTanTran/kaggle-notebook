@@ -101,17 +101,16 @@ The repository also contains the Phase 1 HHR benchmark. Dataset-agnostic
 sparse/dense retrieval, the hierarchical runner, metrics, caching, and artifact
 export live in `src/hhr_dapr`. Hugging Face DAPR download, normalization,
 validation, sampling, protocol controls, and NQ-hard diagnostics intentionally
-live in the orchestration notebook:
-`notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb`.
+live in a Kaggle notebook kept outside Git tracking.
 
 Run its deterministic offline smoke test with:
 
 ```bash
 python -m pip install -e ".[dev,hhr]"
-jupyter notebook notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb
+jupyter notebook <path-to-local-kaggle-notebook>
 ```
 
-The notebook can be uploaded by itself to Kaggle: with Internet enabled it clones
-this repository and installs the required extras. Real modes download the pinned
+The local notebook can be uploaded by itself to Kaggle: with Internet enabled it
+clones this repository and installs the required extras. Real modes download the pinned
 `UKPLab/dapr` Hugging Face revision; no corpora are committed. See
 `docs/hhr_dapr/` for the workflow and Phase 1 protocol.

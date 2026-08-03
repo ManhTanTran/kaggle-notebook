@@ -10,8 +10,8 @@ package owns retrieval, metrics, experiment execution, caching, and artifacts.
 1. Push this repository to GitHub.
 2. In Kaggle, create a notebook and enable **Internet**. A GPU is recommended for
    real dense runs but is unnecessary for smoke mode.
-3. Import
-   `notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb` from GitHub, or upload that file.
+3. Upload your local `01_phase1_hhr_dapr.ipynb` file. The notebook itself is not
+   tracked in GitHub.
 4. Run all cells unchanged. The default smoke run clones the repository when
    needed, installs dependencies, and validates the full pipeline without
    downloading DAPR.
@@ -32,12 +32,10 @@ Kaggle session. Do not interpret synthetic smoke metrics as benchmark results.
 ```powershell
 python -m pip install -e ".[dev,hhr]"
 python -m pytest
-jupyter notebook notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb
+jupyter notebook <path-to-local-kaggle-notebook>
 ```
 
-The paired `01_phase1_hhr_dapr.py` is the text source used to review and rebuild
-the notebook. Dataset-specific functions remain notebook-local, not reusable
-package APIs.
+Dataset-specific functions remain notebook-local, not reusable package APIs.
 
 ## Normalized boundary
 

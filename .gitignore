@@ -3,6 +3,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .ipynb_checkpoints/
+notebooks/hhr_dapr/01_phase1_hhr_dapr.ipynb
+notebooks/hhr_dapr/01_phase1_hhr_dapr.py
 *.pyc
 *.egg-info/
 data/raw/*
